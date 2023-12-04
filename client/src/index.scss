@@ -3,10 +3,10 @@
 @import "tailwindcss/utilities";
 
 /* VARIABLES */
-$theme-dark: #000000;
-$theme-light: #ffffff;
-$theme-accent: #ffffff;
-$theme-text: #000000;
+$theme-dark: #25252a;
+$theme-light: #474E68;
+$theme-accent: #6B728E;
+$theme-text: #ffffff;
 $main-padding: 0 5%;
 
 /* RESETS */
@@ -26,7 +26,38 @@ body,
 }
 
 /* GLOBAL CLASSES */
+body {
+  background-color: $theme-dark;
+}
 
+#root {
+  display: flex;
+  flex-direction: column;
+}
 
+main {
+  flex: 1;
+  padding: 0 2%;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+.main-padding {
+    padding: $main-padding;
+}
 
 /* CUSTOM CLASSES */
+
+
+footer {
+  p {
+    font-size: 12px;
+    
+    &:not(:last-child) {
+      margin-bottom: 4px;
+    }
+  }
+}
