@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/HunterMuratore/Puzzles/issues"
   },
-  "homepage": "https://github.com/HunterMuratore/Puzzles#readme"
+  "homepage": "https://github.com/HunterMuratore/Puzzles#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
