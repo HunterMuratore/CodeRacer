@@ -1,0 +1,32 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* VARIABLES */
+$theme-dark: #000000;
+$theme-light: #ffffff;
+$theme-accent: #ffffff;
+$theme-text: #000000;
+$main-padding: 0 5%;
+
+/* RESETS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  line-height: 1.4;
+  font-family: sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100vh;
+  color: $theme-text;
+}
+
+/* GLOBAL CLASSES */
+
+
+
+/* CUSTOM CLASSES */
