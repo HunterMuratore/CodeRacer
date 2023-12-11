@@ -1,8 +1,3 @@
-const User = require('../../models/User');
-const path = require('path');
-const fs = require('fs');
-const { v4 } = require('uuid');
-
 const Language = require('../../models/Language');
 
 // Define resolvers for language-related queries and mutations
@@ -31,7 +26,7 @@ const language_resolvers = {
     },
 
     Mutation: {
-        createLanguage: async (_, { name }) => {
+        async createLanguage(_, { name }) {
             try {
                 const language = new Language({ name });
                 await language.save();
@@ -41,7 +36,7 @@ const language_resolvers = {
                 throw new Error('Unable to create language');
             }
         },
-        createCodeBlock: async (_, { languageId, value }) => {
+        async createCodeBlock(_, { languageId, value }) {
             try {
                 const language = await Language.findById(languageId);
                 const codeBlock = { value };

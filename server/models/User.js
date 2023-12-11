@@ -28,9 +28,6 @@ const userSchema = new Schema({
     profilePicture: {
         type: String
     },
-    puzzles: {
-        type: Number
-    }
 }, {
     timestamps: true,
     methods: {
