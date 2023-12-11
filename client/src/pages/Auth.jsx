@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+
+import { REGISTER, LOGIN } from '../utils/mutations';
 
 const initialFormData = {
     email: '',
@@ -9,34 +11,6 @@ const initialFormData = {
     identifier: '',
     password: ''
 }
-
-const REGISTER_USER = gql`
-    mutation RegisterUser($email: String!, $username: String!, $password: String!) {
-        register(email: $email, username: $username, password: $password) {
-            _id
-            email
-            username
-            wishlists {
-                _id
-                name
-            }
-        }
-    }
-`
-
-const LOGIN_USER = gql`
-    mutation LoginUser($identifier: String!, $password: String!) {
-        login(identifier: $identifier, password: $password) {
-            _id
-            email
-            username
-            wishlists {
-                _id
-                name
-            }
-        }
-    }
-`
 
 function Auth({ isLogin }) {
     const { setState } = useStore();
@@ -48,7 +22,7 @@ function Auth({ isLogin }) {
     });
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-    const [authenticateUser] = useMutation(isLogin ? LOGIN_USER : REGISTER_USER, {
+    const [authenticateUser] = useMutation(isLogin ? LOGIN : REGISTER, {
         variables: formData,
     });
 

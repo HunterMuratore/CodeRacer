@@ -4,14 +4,6 @@ import { useMutation, gql } from '@apollo/client';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 
-const links = [
-    { name: 'Home', to: '/' },
-    { name: 'Highscores', to: '/highscores' },
-    { name: 'Profile', to: '/profile' },
-    { name: 'Register', to: '/register' },
-    { name: 'Logout', to: '/logout' },
-];
-
 const LOGOUT_USER = gql`
     mutation {
         logout

@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useEffect } from 'react'
 import { useStore } from './store'
 
@@ -13,16 +13,7 @@ import Profile from './pages/Profile'
 import Highscores from './pages/Highscores'
 import NotFound from './pages/NotFound'
 
-export const AUTHENTICATE = gql`
-  query {
-    authenticate {
-      _id
-      email
-      username
-      profilePicture
-    }
-  }
-`
+import { AUTHENTICATE } from './utils/queries'
 
 function App() {
   const { data: userData } = useQuery(AUTHENTICATE);

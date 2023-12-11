@@ -37,7 +37,7 @@ main {
 }
 
 section {
-  padding: 0 5%;
+  padding: $main-padding;
 }
 
 a {
@@ -55,7 +55,6 @@ a {
   border-radius: 6px;
   padding: 5px;
   color: $theme-text;
-  // lighten($theme-accent, 10%);
 
   &:hover,
   &.open {
@@ -76,7 +75,9 @@ body {
 }
 
 .home {
-
+  input {
+    background-color: $theme-dark;
+  }
 }
 
 header {
