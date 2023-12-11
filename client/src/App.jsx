@@ -3,10 +3,13 @@ import { useQuery, gql } from '@apollo/client'
 import { useEffect } from 'react'
 import { useStore } from './store'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
-
 import Footer from './components/Footer'
+import Header from './components/Header'
+
+import Home from './pages/Home'
+import Auth from './pages/Auth'
+import Profile from './pages/Profile'
+import Highscores from './pages/Highscores'
 
 export const AUTHENTICATE = gql`
   query {
@@ -34,23 +37,7 @@ function App() {
 
   return (
     <>
-      <main className="flex flex-wrap items-center justify-center mx-auto">
-        <button>
-          <FontAwesomeIcon className="p-4" icon={faMagnifyingGlass} />
-        </button>
-        <button>
-          <FontAwesomeIcon className="p-4" icon={faMagnifyingGlass} />
-        </button>
-        <button>
-          <FontAwesomeIcon className="p-4" icon={faMagnifyingGlass} />
-        </button>
-        <button>
-          <FontAwesomeIcon className="p-4" icon={faMagnifyingGlass} />
-        </button>
-        <button>
-          <FontAwesomeIcon className="p-4" icon={faMagnifyingGlass} />
-        </button>
-      </main>
+      <Header />
 
       <Footer />
     </>
