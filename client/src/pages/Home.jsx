@@ -9,6 +9,9 @@ function Home() {
     const [userInput, setUserInput] = useState('');
     const [startTime, setStartTime] = useState(null);
     const [typingSpeed, setTypingSpeed] = useState(null);
+    const [timer, setTimer] = useState(90);
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [score, setScore] = useState(null);
     const inputRef = useRef(null);
 
     // Fetch languages when the component mounts
@@ -35,8 +38,27 @@ function Home() {
         }
     }, [codeBlocksLoading, codeBlocksData, languageId]);
 
+    useEffect(() => {
+        // Check if the timer has reached 0
+        if (timer === 0) {
+            // Stop the timer
+            setTimerStarted(false);
+            // Calculate and display the score
+            calculateScore();
+        }
+    }, [timer]);
+
     const generateRandomIndex = (maxIndex) => {
         return Math.floor(Math.random() * maxIndex);
+    };
+
+    const calculateScore = () => {
+        const endTime = Date.now();
+        const timeInSeconds = (endTime - startTime) / 1000;
+        const charactersTyped = userInput.length;
+        const cpm = Math.round((charactersTyped / timeInSeconds) * 60); // Characters per minute
+        setTypingSpeed(cpm);
+        setScore(charactersTyped);
     };
 
     const handleInputChange = (e) => {
@@ -46,16 +68,16 @@ function Home() {
 
         // Start the timer when the user starts typing
         if (!startTime) {
+            setTimerStarted(true);
             setStartTime(Date.now());
         }
 
         // Check if the input matches the code block
         const codeBlockText = codeBlocks[currentCodeBlockIndex]?.value;
         if (inputText === codeBlockText && !typingSpeed) {
-            const endTime = Date.now();
-            const timeInSeconds = (endTime - startTime) / 1000;
-            const speed = Math.round((codeBlockText.length / 5) / timeInSeconds); // Adjust for word length
-            setTypingSpeed(speed);
+            // User has completed typing the code block
+            setTimerStarted(false);
+            calculateScore();
         }
     };
 
@@ -63,47 +85,119 @@ function Home() {
         // Generate a new random index for the code block array
         const newIndex = generateRandomIndex(codeBlocks.length);
         setCurrentCodeBlockIndex(newIndex);
-        // Reset typing speed and user input
+        // Reset typing speed, user input, and timer
         setTypingSpeed(null);
         setUserInput('');
-        // Start the timer when the user starts typing the new code block
-        setStartTime(Date.now());
+        setTimer(90);
+        setTimerStarted(false);
     };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault(); // Prevent the default tab behavior
+            const { selectionStart, selectionEnd } = e.target;
+            const spaces = '    '; // Four spaces
+            const newInput =
+                userInput.substring(0, selectionStart) +
+                spaces +
+                userInput.substring(selectionEnd);
+
+            setUserInput(newInput);
+        }
+    };
+
+
+    const generateSpanArray = (text, userInput) => {
+        const spanArray = [];
+        const minLength = Math.min(text.length, userInput.length);
+
+        for (let i = 0; i < minLength; i++) {
+            const isCorrect = text[i] === userInput[i];
+            const backgroundColor = isCorrect ? 'bg-green-700' : 'bg-red-700';
+
+            spanArray.push(
+                <span key={i} className={`text-white ${backgroundColor}`}>
+                    {text[i]}
+                </span>
+            );
+        }
+
+        if (text.length > minLength) {
+            for (let i = minLength; i < text.length; i++) {
+                spanArray.push(
+                    <span key={i} className="text-white">
+                        {text[i]}
+                    </span>
+                );
+            }
+        }
+
+        return spanArray;
+    };
+
+    useEffect(() => {
+        // Update the timer every second if timer has started
+        if (timerStarted && timer > 0) {
+            const interval = setInterval(() => {
+                setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
+            }, 1000);
+
+            // Cleanup the interval on component unmount
+            return () => clearInterval(interval);
+        }
+    }, [timerStarted, timer]);
 
     return (
         <section className="home flex flex-col items-center justify-center mt-36 mx-auto">
-            <div className="code-block flex flex-col items-center">
+            <div className="flex items-center">
                 {/* Display buttons for each language */}
-                {languagesData &&
-                    languagesData.getLanguages.map((language) => (
-                        <p
-                            key={language._id}
-                            onClick={() => setLanguageId(language._id)}
-                            className="cursor-pointer"
-                        >
-                            {language.name}
-                        </p>
-                    ))}
+                <div className="languages flex mr-3">
+                    {languagesData &&
+                        languagesData.getLanguages.map((language) => (
+                            <p
+                                key={language._id}
+                                onClick={() => setLanguageId(language._id)}
+                                className="cursor-pointer"
+                            >
+                                {language.name} | 
+                            </p>
+                        ))}
+                </div>
                 {/* Display button to fetch a new random code block */}
                 <button onClick={handleButtonClick} className="my-btn my-3">
-                    New Code Block
+                    New Race
                 </button>
             </div>
-            {/* Display the current code block */}
-            <div className="bg-gray-800 p-4 rounded-md mt-4 flex flex-col items-center">
+            {/* Display the current code block with dynamic styling */}
+            <div className="code-block p-4 rounded-md my-3">
                 {codeBlocks[currentCodeBlockIndex] && (
-                    <p className="my-2">{codeBlocks[currentCodeBlockIndex].value}</p>
+                    <pre className="my-2 text-white">
+                        <code>
+                            {generateSpanArray(
+                                codeBlocks[currentCodeBlockIndex].value,
+                                userInput
+                            )}
+                        </code>
+                    </pre>
                 )}
             </div>
+
             <textarea
                 rows="4" // Set the number of rows you want to display
                 ref={inputRef}
                 value={userInput}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onPaste={(e) => e.preventDefault()}
                 className="p-2 rounded-md focus:outline-none mt-4 resize-none"
-                placeholder="Type here..."
+                placeholder="Timer starts when you type..."
             />
-            {typingSpeed && <p className="mt-4">Typing speed: {typingSpeed} WPM</p>}
+            {timer > 0 && <p className="mt-4">Time remaining: {timer} seconds</p>}
+            {score !== null && (
+                <p className="mt-4">
+                    {score === 0 ? 'Complete! Your score is 0 CPM (Time ran out)' : `Complete! Your score is ${score} CPM`}
+                </p>
+            )}
         </section>
     );
 }

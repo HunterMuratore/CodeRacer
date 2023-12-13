@@ -75,6 +75,17 @@ body {
 }
 
 .home {
+  .languages {
+    p:not(:last-child) {
+      margin-right: 7px;
+    }
+  }
+
+  .code-block {
+    background-color: darken($theme-dark, 8%);
+    width: 350px;
+  }
+
   textarea {
     background-color: $theme-dark;
     width: 450px;
