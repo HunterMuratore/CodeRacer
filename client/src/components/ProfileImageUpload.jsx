@@ -51,8 +51,8 @@ function ProfileImageUpload({ onUpload, toggle }) {
     };
 
     return (
-        <div className='upload mt-4 flex flex-col mx-auto justify-center'>
-            <h2>Upload Profile Picture</h2>
+        <div className='upload my-4 flex flex-col mx-auto justify-center'>
+            <h2 className='my-2'>Upload Profile Picture</h2>
 
             <div>{alertMessage && <Alert message={alertMessage} onClose={() => setAlertMessage("")} />}</div>
 
@@ -64,13 +64,13 @@ function ProfileImageUpload({ onUpload, toggle }) {
             />
             {selectedImage && (
                 <div className='flex flex-col'>
-                    <h3>Preview:</h3>
+                    <h3 className='my-2'>Preview:</h3>
                     <img
                         src={URL.createObjectURL(selectedImage)}
                         alt="Profile"
                         style={{ width: '200px', height: '200px', objectFit: 'cover' }}
                     />
-                    <button className="my-btn mt-2" onClick={handleUpload}>Save Image</button>
+                    <button className="my-btn mt-2 mb-10" onClick={handleUpload}>Save Image</button>
                 </div>
             )}
         </div>
