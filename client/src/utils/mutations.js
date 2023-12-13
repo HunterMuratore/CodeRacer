@@ -36,3 +36,17 @@ export const CREATE_CODE_BLOCK = gql`
     }
   }
 `;
+
+export const UPLOAD_PROFILE_PICTURE = gql`
+  mutation uploadProfilePicture(
+    $id: ID!,
+    $profilePicture: Upload!
+  ) {
+    uploadProfilePicture (
+      id: $id,
+      profilePicture: $profilePicture
+    ) {
+        profilePicture
+    }
+  }
+`

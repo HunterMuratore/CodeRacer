@@ -55,11 +55,19 @@ function Home() {
     const calculateScore = () => {
         const endTime = Date.now();
         const timeInSeconds = (endTime - startTime) / 1000;
-        const charactersTyped = userInput.length;
-        const cpm = Math.round((charactersTyped / timeInSeconds) * 60); // Characters per minute
+
+        // Calculate the number of correct characters typed
+        const correctCharacters = userInput.split('').reduce((count, char, index) => {
+            return count + (char === codeBlocks[currentCodeBlockIndex].value[index] ? 1 : 0);
+        }, 0);
+
+        // Calculate CPM based on correct characters
+        const cpm = Math.round((correctCharacters / timeInSeconds) * 60);
+
         setTypingSpeed(cpm);
-        setScore(charactersTyped);
+        setScore(correctCharacters);
     };
+
 
     const handleInputChange = (e) => {
         const inputText = e.target.value;
@@ -82,9 +90,15 @@ function Home() {
     };
 
     const handleButtonClick = () => {
-        // Generate a new random index for the code block array
-        const newIndex = generateRandomIndex(codeBlocks.length);
-        setCurrentCodeBlockIndex(newIndex);
+        if (codeBlocks.length > 1) {
+            let newIndex;
+
+            do {
+                // Generate a new random index for the code block array
+                newIndex = generateRandomIndex(codeBlocks.length);
+            } while (newIndex === currentCodeBlockIndex);
+            setCurrentCodeBlockIndex(newIndex);
+        }
         // Reset typing speed, user input, and timer
         setTypingSpeed(null);
         setUserInput('');
@@ -159,7 +173,7 @@ function Home() {
                                 onClick={() => setLanguageId(language._id)}
                                 className="cursor-pointer"
                             >
-                                {language.name} | 
+                                {language.name} |
                             </p>
                         ))}
                 </div>
