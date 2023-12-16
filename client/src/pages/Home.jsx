@@ -9,10 +9,11 @@ function Home() {
     const [userInput, setUserInput] = useState('');
     const [startTime, setStartTime] = useState(null);
     const [typingSpeed, setTypingSpeed] = useState(null);
-    const [timer, setTimer] = useState(90);
+    const [timer, setTimer] = useState(120);
     const [timerStarted, setTimerStarted] = useState(false);
     const [score, setScore] = useState(null);
     const inputRef = useRef(null);
+    const timerIntervalRef = useRef(null);
 
     // Fetch languages when the component mounts
     const { loading: languagesLoading, data: languagesData } = useQuery(GET_LANGUAGES);
@@ -39,9 +40,36 @@ function Home() {
     }, [codeBlocksLoading, codeBlocksData, languageId]);
 
     useEffect(() => {
-        // Check if the timer has reached 0
+        // Update the timer every second if timer has started
+        if (timerStarted && timer > 0) {
+            timerIntervalRef.current = setInterval(() => {
+                setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
+            }, 1000);
+
+            // Cleanup the interval on component unmount or when language changes
+            return () => clearInterval(timerIntervalRef.current);
+        }
+    }, [timerStarted, timer]);
+
+
+    useEffect(() => {
+        // Reset state when languageId changes
+        setUserInput('');
+        setTimer(120);
+        setTimerStarted(false);
+        setTypingSpeed(null);
+        setScore(null);
+        setStartTime(null);
+
+        // Clear the timer interval
+        clearInterval(timerIntervalRef.current);
+
+        // Fetch new code blocks for the current language
+        handleButtonClick();
+    }, [languageId]);
+
+    useEffect(() => {
         if (timer === 0) {
-            // Stop the timer
             setTimerStarted(false);
             // Calculate and display the score
             calculateScore();
@@ -53,8 +81,7 @@ function Home() {
     };
 
     const calculateScore = () => {
-        const endTime = Date.now();
-        const timeInSeconds = (endTime - startTime) / 1000;
+        const timeInSeconds = (120 - timer);
 
         // Calculate the number of correct characters typed
         const correctCharacters = userInput.split('').reduce((count, char, index) => {
@@ -63,25 +90,26 @@ function Home() {
 
         // Calculate CPM based on correct characters
         const cpm = Math.round((correctCharacters / timeInSeconds) * 60);
+        const cps = (cpm / 60).toFixed(1);
 
         setTypingSpeed(cpm);
-        setScore(correctCharacters);
+        setScore(cps);
     };
-
 
     const handleInputChange = (e) => {
         const inputText = e.target.value;
 
-        setUserInput(inputText);
-
         // Start the timer when the user starts typing
-        if (!startTime) {
+        if (!startTime && !timerStarted) {
             setTimerStarted(true);
             setStartTime(Date.now());
         }
 
+        setUserInput(inputText);
+
         // Check if the input matches the code block
         const codeBlockText = codeBlocks[currentCodeBlockIndex]?.value;
+
         if (inputText === codeBlockText && !typingSpeed) {
             // User has completed typing the code block
             setTimerStarted(false);
@@ -102,15 +130,15 @@ function Home() {
         // Reset typing speed, user input, and timer
         setTypingSpeed(null);
         setUserInput('');
-        setTimer(90);
+        setTimer(120);
         setTimerStarted(false);
     };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Tab') {
-            e.preventDefault(); // Prevent the default tab behavior
+            e.preventDefault();
             const { selectionStart, selectionEnd } = e.target;
-            const spaces = '    '; // Four spaces
+            const spaces = '  '; // two spaces
             const newInput =
                 userInput.substring(0, selectionStart) +
                 spaces +
@@ -119,7 +147,6 @@ function Home() {
             setUserInput(newInput);
         }
     };
-
 
     const generateSpanArray = (text, userInput) => {
         const spanArray = [];
@@ -148,18 +175,6 @@ function Home() {
 
         return spanArray;
     };
-
-    useEffect(() => {
-        // Update the timer every second if timer has started
-        if (timerStarted && timer > 0) {
-            const interval = setInterval(() => {
-                setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
-            }, 1000);
-
-            // Cleanup the interval on component unmount
-            return () => clearInterval(interval);
-        }
-    }, [timerStarted, timer]);
 
     return (
         <section className="home flex flex-col items-center justify-center mt-36 mx-auto">
@@ -196,6 +211,8 @@ function Home() {
                 )}
             </div>
 
+            {timer > 0 && <p className="my-3">Time remaining: {timer} seconds</p>}
+
             <textarea
                 rows="4" // Set the number of rows you want to display
                 ref={inputRef}
@@ -206,10 +223,10 @@ function Home() {
                 className="p-2 rounded-md focus:outline-none mt-4 resize-none"
                 placeholder="Timer starts when you type..."
             />
-            {timer > 0 && <p className="mt-4">Time remaining: {timer} seconds</p>}
+            
             {score !== null && (
                 <p className="mt-4">
-                    {score === 0 ? 'Complete! Your score is 0 CPM (Time ran out)' : `Complete! Your score is ${score} CPM`}
+                    {score === 0 ? 'Complete! Your score is 0 CPM (Time ran out)' : `Complete! Your score is ${score} CPS (characters per second)`}
                 </p>
             )}
         </section>
