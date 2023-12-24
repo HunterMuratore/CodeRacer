@@ -7,9 +7,13 @@ export const AUTHENTICATE = gql`
       email
       username
       profilePicture
+      highscores {
+        score
+        languageName
+      }
     }
   }
-`
+`;
 
 export const GET_LANGUAGES = gql`
   query GetLanguages {

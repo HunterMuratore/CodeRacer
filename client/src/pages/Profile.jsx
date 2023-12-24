@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useStore } from "../store"
+import { useQuery } from '@apollo/client';
+import { AUTHENTICATE } from '../utils/queries';
 import { useNavigate } from "react-router-dom"
 
 import profilePic from '../assets/images/default_pfp.png'
@@ -8,8 +10,16 @@ import ProfileImageUpload from '../components/ProfileImageUpload'
 
 function Profile() {
     const { user, setState } = useStore()
+    const { loading, error, data } = useQuery(AUTHENTICATE);
     const [showProfileImageUpload, setShowProfileImageUpload] = useState(false);
     const navigate = useNavigate()
+
+    useEffect(() => {
+        if (data) {
+            // Update the global state with user data
+            setState({ user: data.authenticate });
+        }
+    }, [data, setState])
 
     function toLogin() {
         navigate('/login')
@@ -50,6 +60,17 @@ function Profile() {
                     </div>
 
                     <h1 className="font-bold mt-4 mb-4 text-center">{user.username}'s Highscores</h1>
+
+
+                    <div className="highscores">
+                        <ul>
+                            {user.highscores.map((score, index) => (
+                                <li key={index}>
+                                    Score: {score.score}, Language ID: {score.languageId}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
 
                 </section>

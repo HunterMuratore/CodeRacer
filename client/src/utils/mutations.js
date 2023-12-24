@@ -1,23 +1,27 @@
 import { gql } from '@apollo/client'
 
 export const REGISTER = gql`
-    mutation Register($email: String!, $username: String!, $password: String!) {
-        register(email: $email, username: $username, password: $password) {
-            _id
-            email
-            username
-        }
+  mutation Register($email: String!, $username: String!, $password: String!) {
+    register(email: $email, username: $username, password: $password) {
+      _id
+      email
+      username
     }
+  }
 `
 
 export const LOGIN = gql`
-    mutation Login($identifier: String!, $password: String!) {
-        login(identifier: $identifier, password: $password) {
-            _id
-            email
-            username
-        }
+  mutation Login($identifier: String!, $password: String!) {
+    login(identifier: $identifier, password: $password) {
+      _id
+      email
+      username
+      highscores {
+        score
+        languageName
+      }
     }
+  }
 `
 
 export const CREATE_LANGUAGE = gql`
@@ -38,15 +42,15 @@ export const CREATE_CODE_BLOCK = gql`
 `;
 
 export const UPLOAD_PROFILE_PICTURE = gql`
-  mutation uploadProfilePicture(
-    $id: ID!,
-    $profilePicture: Upload!
-  ) {
-    uploadProfilePicture (
-      id: $id,
-      profilePicture: $profilePicture
-    ) {
-        profilePicture
+  mutation uploadProfilePicture($id: ID!, $profilePicture: Upload!) {
+    uploadProfilePicture (id: $id, profilePicture: $profilePicture) {
+      profilePicture
     }
   }
-`
+`;
+
+export const UPDATE_HIGH_SCORE = gql`
+  mutation UpdateHighScore($score: Float!, $languageID: ID!) {
+    updateHighScore(score: $score, languageID: $languageID)
+  }
+`;

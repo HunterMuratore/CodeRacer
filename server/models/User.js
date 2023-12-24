@@ -28,6 +28,18 @@ const userSchema = new Schema({
     profilePicture: {
         type: String
     },
+    highscores: [
+        {
+            score: {
+                type: Number,
+                required: true,
+            },
+            languageId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Language',
+            },
+        },
+    ],
 }, {
     timestamps: true,
     methods: {
