@@ -9,7 +9,7 @@ const typeDefs = gql`
 
     type HighScore {
         score: Float
-        languageId: ID
+        languageName: String
     }
 
     type Language {

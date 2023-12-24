@@ -5,6 +5,7 @@ import { UPDATE_HIGH_SCORE } from '../utils/mutations';
 
 function Home() {
     const [languageId, setLanguageId] = useState(null);
+    const [languageName, setLanguageName] = useState(null);
     const [codeBlocks, setCodeBlocks] = useState([]);
     const [currentCodeBlockIndex, setCurrentCodeBlockIndex] = useState(null);
     const [userInput, setUserInput] = useState('');
@@ -32,6 +33,7 @@ function Home() {
     useEffect(() => {
         if (!languagesLoading && languagesData && languagesData.getLanguages.length > 0) {
             setLanguageId(languagesData.getLanguages[0]._id);
+            setLanguageName(languagesData.getLanguages[0].name);
         }
     }, [languagesLoading, languagesData]);
 
@@ -99,13 +101,8 @@ function Home() {
         setTypingSpeed(cpm);
         setScore(cps);
 
-        console.log(codeBlocks.languageId)
-
-        // Check if the user successfully completed the code block
-        if (userInput === codeBlocks[currentCodeBlockIndex]?.value) {
-            // Update high score when the user successfully completes the code block
-            handleUpdateHighScore(cps, codeBlocks.languageId);
-        }
+        // Update high score when the user successfully completes the code block
+        handleUpdateHighScore(cps, languageName);
     };
 
     const handleInputChange = (e) => {
@@ -127,6 +124,11 @@ function Home() {
             setTimerStarted(false);
             calculateScore();
         }
+    };
+
+    const handleLanguageClick = (languageId, languageName) => {
+        setLanguageId(languageId);
+        setLanguageName(languageName);
     };
 
     const handleButtonClick = () => {
@@ -189,19 +191,21 @@ function Home() {
         return spanArray;
     };
 
-    const handleUpdateHighScore = async (score, languageId) => {
+    const handleUpdateHighScore = async (cps, languageName) => {
+        const score = parseFloat(cps)
+
         try {
-          const { data } = await updateHighScore({
-            variables: { score, languageID: languageId },
-          });
-      
-          // Handle the response if needed
-          console.log("highscore data", data.updateHighScore);
+            const { data } = await updateHighScore({
+                variables: { score, languageName },
+            });
+
+            // Handle the response if needed
+            console.log("highscore data", data.updateHighScore);
         } catch (error) {
-          // Handle errors
-          console.error(error);
+            // Handle errors
+            console.error(error);
         }
-      };            
+    };
 
     return (
         <section className="home flex flex-col items-center justify-center mt-36 mx-auto">
@@ -212,7 +216,7 @@ function Home() {
                         languagesData.getLanguages.map((language) => (
                             <p
                                 key={language._id}
-                                onClick={() => setLanguageId(language._id)}
+                                onClick={() => handleLanguageClick(language._id, language.name)}
                                 className="cursor-pointer"
                             >
                                 {language.name} |
@@ -241,7 +245,7 @@ function Home() {
             {timer > 0 && <p className="my-3">Time remaining: {timer} seconds</p>}
 
             <textarea
-                rows="4" // Set the number of rows you want to display
+                rows="4"
                 ref={inputRef}
                 value={userInput}
                 onChange={handleInputChange}

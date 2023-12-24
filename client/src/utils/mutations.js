@@ -50,7 +50,7 @@ export const UPLOAD_PROFILE_PICTURE = gql`
 `;
 
 export const UPDATE_HIGH_SCORE = gql`
-  mutation UpdateHighScore($score: Float!, $languageID: ID!) {
-    updateHighScore(score: $score, languageID: $languageID)
+  mutation UpdateHighScore($score: Float!, $languageName: String!) {
+    updateHighScore(score: $score, languageName: $languageName)
   }
 `;
