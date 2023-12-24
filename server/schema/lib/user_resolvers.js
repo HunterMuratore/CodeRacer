@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const Language = require('../../models/Language');
 const path = require('path');
 const fs = require('fs');
 const { v4 } = require('uuid');
@@ -121,8 +122,36 @@ const user_resolvers = {
 
             // Return the file path where the image is stored
             return filePath;
-        }
+        },
+
+        async updateHighScore(_, { score, languageName }, { user }) {
+            try {
+                if (!user) {
+                    throw new Error('User not authenticated');
+                }
+        
+                // Find the language by ID
+                const language = await Language.findOne({ name: languageName });
+        
+                if (!language) {
+                    throw new Error('Language not found');
+                }
+        
+                // Update the highscores array
+                user.highscores.push({
+                    score,
+                    languageName: language.name,
+                });
+        
+                // Save the updated user
+                await user.save();
+        
+                return 'High score updated successfully';
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },        
     }
-}
+};
 
 module.exports = user_resolvers;
