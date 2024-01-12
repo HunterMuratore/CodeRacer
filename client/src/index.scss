@@ -132,26 +132,6 @@ header {
   }
 }
 
-.profile {
-  .profile-picture {
-    margin: 0 auto;
-    height: 110px;
-    width: 110px;
-    border-radius: 50%;
-    overflow: hidden;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  .alert {
-    border: 1px solid #000000;
-    padding: 10px;
-    margin: 10px;
-  }
-}
-
 form {
   max-width: 450px;
   margin: 0 auto;

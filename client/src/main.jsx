@@ -7,7 +7,7 @@ import { StoreProvider } from './store.jsx'
 
 import { BrowserRouter as Router } from 'react-router-dom'
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -19,6 +19,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
   if (networkError) {
     console.error(`[Network error]: ${networkError}`)
+    console.error(networkError.stack)
   }
 })
 
