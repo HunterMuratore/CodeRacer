@@ -6,7 +6,6 @@ export const AUTHENTICATE = gql`
       _id
       email
       username
-      profilePicture
     }
   }
 `

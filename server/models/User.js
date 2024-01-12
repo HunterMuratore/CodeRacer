@@ -25,9 +25,6 @@ const userSchema = new Schema({
         type: String,
         minLength: [6, 'Password must be at least 6 characters long']
     },
-    profilePicture: {
-        type: String
-    },
 }, {
     timestamps: true,
     methods: {

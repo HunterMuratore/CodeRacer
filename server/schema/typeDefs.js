@@ -17,7 +17,6 @@ const typeDefs = gql`
         _id: ID
         email: String
         username: String
-        profilePicture: String
         createdAt: String
         updatedAt: String
     }
@@ -33,7 +32,6 @@ const typeDefs = gql`
         register(email: String!, username: String!, password: String!): User
         login(identifier: String!, password: String!): User
         logout: String
-        uploadProfilePicture(id: ID!, profilePicture: Upload!): User
         createLanguage(name: String!): Language
         createCodeBlock(languageId: ID!, value: String!): CodeBlock
     }
