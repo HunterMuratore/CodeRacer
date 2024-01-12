@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { GET_LANGUAGES, GET_CODE_BLOCKS } from '../utils/queries';
+import { UPDATE_HIGH_SCORE } from '../utils/mutations';
 
 function Home() {
     const [languageId, setLanguageId] = useState(null);
+    const [languageName, setLanguageName] = useState(null);
     const [codeBlocks, setCodeBlocks] = useState([]);
     const [currentCodeBlockIndex, setCurrentCodeBlockIndex] = useState(null);
     const [userInput, setUserInput] = useState('');
@@ -24,23 +26,27 @@ function Home() {
         skip: !languageId,
     });
 
+    // Mutation to save the user's scores
+    const [updateHighScore] = useMutation(UPDATE_HIGH_SCORE);
+
+    // Set default language when languages are loaded
     useEffect(() => {
-        // Set default language when languages are loaded
         if (!languagesLoading && languagesData && languagesData.getLanguages.length > 0) {
             setLanguageId(languagesData.getLanguages[0]._id);
+            setLanguageName(languagesData.getLanguages[0].name);
         }
     }, [languagesLoading, languagesData]);
 
+    // Set code blocks when languageId changes
     useEffect(() => {
-        // Set code blocks when languageId changes
         if (!codeBlocksLoading && codeBlocksData) {
             setCodeBlocks(codeBlocksData.getCodeBlocks);
             setCurrentCodeBlockIndex(generateRandomIndex(codeBlocksData.getCodeBlocks.length));
         }
     }, [codeBlocksLoading, codeBlocksData, languageId]);
 
+    // Update the timer every second if timer has started
     useEffect(() => {
-        // Update the timer every second if timer has started
         if (timerStarted && timer > 0) {
             timerIntervalRef.current = setInterval(() => {
                 setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
@@ -52,8 +58,8 @@ function Home() {
     }, [timerStarted, timer]);
 
 
+    // Reset state when languageId changes
     useEffect(() => {
-        // Reset state when languageId changes
         setUserInput('');
         setTimer(120);
         setTimerStarted(false);
@@ -94,6 +100,9 @@ function Home() {
 
         setTypingSpeed(cpm);
         setScore(cps);
+
+        // Update high score when the user successfully completes the code block
+        handleUpdateHighScore(cps, languageName);
     };
 
     const handleInputChange = (e) => {
@@ -115,6 +124,11 @@ function Home() {
             setTimerStarted(false);
             calculateScore();
         }
+    };
+
+    const handleLanguageClick = (languageId, languageName) => {
+        setLanguageId(languageId);
+        setLanguageName(languageName);
     };
 
     const handleButtonClick = () => {
@@ -148,6 +162,7 @@ function Home() {
         }
     };
 
+    // Turn the code block into an array to track each character typed
     const generateSpanArray = (text, userInput) => {
         const spanArray = [];
         const minLength = Math.min(text.length, userInput.length);
@@ -176,6 +191,22 @@ function Home() {
         return spanArray;
     };
 
+    const handleUpdateHighScore = async (cps, languageName) => {
+        const score = parseFloat(cps)
+
+        try {
+            const { data } = await updateHighScore({
+                variables: { score, languageName },
+            });
+
+            // Handle the response if needed
+            console.log("highscore data", data.updateHighScore);
+        } catch (error) {
+            // Handle errors
+            console.error(error);
+        }
+    };
+
     return (
         <section className="home flex flex-col items-center justify-center mt-36 mx-auto">
             <div className="flex items-center">
@@ -185,7 +216,7 @@ function Home() {
                         languagesData.getLanguages.map((language) => (
                             <p
                                 key={language._id}
-                                onClick={() => setLanguageId(language._id)}
+                                onClick={() => handleLanguageClick(language._id, language.name)}
                                 className="cursor-pointer"
                             >
                                 {language.name} |
@@ -214,7 +245,7 @@ function Home() {
             {timer > 0 && <p className="my-3">Time remaining: {timer} seconds</p>}
 
             <textarea
-                rows="4" // Set the number of rows you want to display
+                rows="4"
                 ref={inputRef}
                 value={userInput}
                 onChange={handleInputChange}
@@ -223,7 +254,7 @@ function Home() {
                 className="p-2 rounded-md focus:outline-none mt-4 resize-none"
                 placeholder="Timer starts when you type..."
             />
-            
+
             {score !== null && (
                 <p className="mt-4">
                     {score === 0 ? 'Complete! Your score is 0 CPM (Time ran out)' : `Complete! Your score is ${score} CPS (characters per second)`}

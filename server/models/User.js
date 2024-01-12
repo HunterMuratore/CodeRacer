@@ -25,6 +25,18 @@ const userSchema = new Schema({
         type: String,
         minLength: [6, 'Password must be at least 6 characters long']
     },
+    highscores: [
+        {
+            score: {
+                type: Number,
+                required: true,
+            },
+            languageId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Language',
+            },
+        },
+    ],
 }, {
     timestamps: true,
     methods: {

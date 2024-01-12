@@ -8,7 +8,7 @@ export const AUTHENTICATE = gql`
       username
     }
   }
-`
+`;
 
 export const GET_LANGUAGES = gql`
   query GetLanguages {

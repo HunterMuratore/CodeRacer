@@ -1,4 +1,8 @@
 const User = require('../../models/User');
+const Language = require('../../models/Language');
+const path = require('path');
+const fs = require('fs');
+const { v4 } = require('uuid');
 
 const { createToken } = require('../../auth');
 
@@ -90,6 +94,35 @@ const user_resolvers = {
 
             return 'User logged out successfully';
         },
+
+        // Resolver to upload a user's profile picture
+        async uploadProfilePicture(_, args, { user }) {
+            const { profilePicture } = args;
+
+            const { file: { createReadStream, filename } } = await profilePicture;
+
+            // Create a readable stream from the uploaded file
+            const readStream = createReadStream();
+
+            // Specify the path where the file should be stored within the public directory
+            const hash = v4();
+            const name = `${hash}.${filename}`;
+            const filePath = path.join(__dirname, '../../public/profile_images', name);
+
+            // Create a writable stream to the specified file path
+            const writeStream = fs.createWriteStream(filePath);
+
+            // Pipe the data from the readable stream to the writable stream
+            readStream.pipe(writeStream);
+
+            // Update the user's profile picture path in the database
+            await User.findOneAndUpdate({ _id: user._id }, {
+                profilePicture: `/profile_images/${name}`
+            });
+
+            // Return the file path where the image is stored
+            return filePath;
+        }
     }
 }
 

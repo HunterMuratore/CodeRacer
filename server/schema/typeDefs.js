@@ -7,6 +7,11 @@ const typeDefs = gql`
         value: String
     }
 
+    type HighScore {
+        score: Float
+        languageName: String
+    }
+
     type Language {
         _id: ID
         name: String
@@ -17,6 +22,7 @@ const typeDefs = gql`
         _id: ID
         email: String
         username: String
+        highscores: [HighScore]
         createdAt: String
         updatedAt: String
     }
@@ -34,6 +40,7 @@ const typeDefs = gql`
         logout: String
         createLanguage(name: String!): Language
         createCodeBlock(languageId: ID!, value: String!): CodeBlock
+        updateHighScore(score: Float!, languageName: String!): String
     }
 `
 module.exports = typeDefs;
